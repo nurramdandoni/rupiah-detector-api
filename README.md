@@ -3,20 +3,7 @@ Deteksi Nominal Rupiah via foto from esp32
 
 ## Project Structure
 
-rupiah-detector/
-├─ .venv/
-├─ requirements.txt
-├─ app.py                 # Flask API (serving)
-├─ model/                 # akan berisi model.pt setelah training
-│   └─ best.pt
-├─ dataset/
-│   ├─ images/
-│   │  ├─ train/
-│   │  └─ val/
-│   └─ labels/
-│      ├─ train/
-│      └─ val/
-└─ data.yaml              # config untuk training YOLO
+![alt text](<Screenshot 2025-12-05 at 15.28.29.png>)
 
 ## Preparing
 
