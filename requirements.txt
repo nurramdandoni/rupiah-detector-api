@@ -1,0 +1,6 @@
+ultralytics       # YOLOv8 (training + inference)
+flask
+opencv-python
+Pillow
+numpy
+gunicorn          # optional untuk production
