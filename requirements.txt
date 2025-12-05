@@ -1,6 +1,7 @@
 ultralytics       # YOLOv8 (training + inference)
-flask
+Flask
 opencv-python
 Pillow
-numpy
+"numpy<2"
 gunicorn          # optional untuk production
+pytesseract
