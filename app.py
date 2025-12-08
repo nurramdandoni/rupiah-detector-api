@@ -1,69 +1,66 @@
 from flask import Flask, request, jsonify
-from ultralytics import YOLO
-from PIL import Image, UnidentifiedImageError
+import cv2
 import numpy as np
-import io
+import os
+
+from utils.compare import compare
 
 app = Flask(__name__)
 
-MODEL_PATH = "runs/classify/train/weights/best.pt"
-model = YOLO(MODEL_PATH)
+TEMPLATES_PATH = "./templates"
 
-CLASS_TO_VALUE = { 
-                    0: 100000,
-                    1: None
-                  }
-
-THRESH = 0.75
-
-
-def read_img(byte_data):
-    img = Image.open(io.BytesIO(byte_data)).convert("RGB")
-    return np.array(img)
+# minimal score diterima
+MIN_ACCEPT = 82   # nanti kamu tuning sendiri
 
 
 @app.route("/detect", methods=["POST"])
 def detect():
-    # cek parameter file
     if "file" not in request.files:
-        return jsonify({"detected": False, "error": "no file uploaded"}), 400
+        return jsonify({"detected": False, "error": "no file"})
 
-    f = request.files["file"]
+    # read binary → convert ke numpy cv2
+    file = request.files["file"].read()
+    img_np = cv2.imdecode(np.frombuffer(file, np.uint8), cv2.IMREAD_COLOR)
 
-    # baca bytes
-    img_bytes = f.read()
-    if len(img_bytes) == 0:
-        return jsonify({"detected": False, "error": "empty file"}), 400
 
-    # convert jpg to numpy
-    try:
-        img = read_img(img_bytes)
-    except UnidentifiedImageError:
-        return jsonify({"detected": False, "error": "invalid image"}), 400
+    best_score = 0
+    best_class = None
 
-    # inference
-    results = model(img)
-    r = results[0]
 
-    probs = r.probs
-    cls_id = int(probs.top1)
-    conf = float(probs.top1conf)
+    # loop semua template
+    for filename in os.listdir(TEMPLATES_PATH):
+        if not filename.lower().endswith(".png"):
+            continue
 
-    if conf < THRESH:
+        nominal = filename.replace(".png", "")
+        template = cv2.imread(f"{TEMPLATES_PATH}/{filename}")
+
+        score = compare(img_np, template)
+
+        # debug
+        print(f"{filename}: {score}")
+
+        if score > best_score:
+            best_score = score
+            best_class = nominal
+
+
+    # jika tidak ada kecocokan
+    if best_class is None or best_score < MIN_ACCEPT:
         return jsonify({
             "detected": False,
-            "confidence": conf
+            "score": best_score,
+            "value": None
         })
 
-    nominal = CLASS_TO_VALUE.get(cls_id)
 
+    # jika berhasil disamakan
     return jsonify({
         "detected": True,
-        "class_index": cls_id,
-        "nominal": nominal,
-        "confidence": conf
+        "score": best_score,
+        "value": best_class
     })
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    app.run("0.0.0.0", 5050, debug=True)
