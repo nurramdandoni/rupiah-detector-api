@@ -18,5 +18,5 @@ Deteksi Nominal Rupiah via foto from esp32
 1. jalankan 'yolo train model=yolo11m-cls.pt data=dataset epochs=50 imgsz=256'
 
 ### Retraining
-1. jalankan 'yolo train model=runs/classify/exp/weights/best.pt data=dataset epochs=20 imgsz=256'
+1. jalankan 'yolo train model=runs/classify/train/weights/best.pt data=dataset epochs=20 imgsz=256'
 
