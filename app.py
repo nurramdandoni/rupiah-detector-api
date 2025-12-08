@@ -32,7 +32,7 @@ def detect():
         if not filename.lower().endswith(".png"):
             continue
 
-        nominal = filename.replace(".png", "")
+        nominal = filename.split("_")[0]
         template = cv2.imread(f"{TEMPLATES_PATH}/{filename}")
 
         score = compare(img_np, template)
