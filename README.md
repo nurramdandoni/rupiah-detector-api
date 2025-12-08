@@ -14,6 +14,9 @@ Deteksi Nominal Rupiah via foto from esp32
 ## Add more train
 1. Untuk meningkatkan akurasi bisa menggunakan https://www.makesense.ai/ untuk melakukan training image labeling
 
-## Training Model
-1. jalankan 'yolo detect train data=dataset.yaml model=yolov8n.pt epochs=50 imgsz=640'
+## Training Model First
+1. jalankan 'yolo train model=yolo11m-cls.pt data=dataset epochs=50 imgsz=256'
+
+### Retraining
+1. jalankan 'yolo train model=runs/classify/exp/weights/best.pt data=dataset epochs=20 imgsz=256'
 
